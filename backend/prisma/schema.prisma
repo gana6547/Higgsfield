@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String @id  @default(uuid())
+  username  String   @unique
+  password  String
+  avatar    Avatar[]
+  avatarVideo AvatarVideo[]
+}
+
+model Avatar{
+  id                    String @id  @default(uuid())
+  userId                String
+  name                  String
+  user                  User   @relation(fields: [userId] ,references: [id])
+  avatarImages          AvatarImage[]
+  avatarVideoRefrences  AvatarVideoReferance[]
+}
+
+model AvatarImage{
+  id        String @id  @default(uuid())
+  avatarId  String
+  type      AvatarImageType
+  url       String
+  avatar    Avatar @relation(fields: [avatarId],references: [id])
+}
+
+model AvatarVideo{
+  id          String @id  @default(uuid())
+  userId      String
+  prompt      String
+  starFrame   String?
+  endFrame    String?
+  duraion     Int
+  width       Int
+  height      Int
+  status      AvatarVideoStatus
+  avatarVideo AvatarVideoReferance[]
+  user    User   @relation(fields: [userId] ,references: [id])
+
+}
+
+model AvatarVideoReferance{
+  id                String @id  @default(uuid())
+  avatarVideoId     String
+  avatarId          String
+  avatar            Avatar @relation(fields: [avatarId] ,references: [id])
+  avatarVideo       AvatarVideo @relation(fields: [avatarVideoId], references: [id])
+}
+
+enum AvatarVideoStatus{
+  Pending
+  Done
+  Errror
+}
+ enum AvatarImageType{
+  Model
+  User
+ }
